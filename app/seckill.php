@@ -88,7 +88,8 @@ class seckill extends common
 
 	/*
 	 * 基于mysql验证库存信息
-	 * 高并发下会导致超卖
+	 * @desc 高并发下会导致超卖
+	 *
 	 * @author liubin
 	 * @date 2017-02-10
 	*/
@@ -127,8 +128,9 @@ class seckill extends common
 
 
 	/*
-	 * 基于mysql验证库存信息
-	 * 高并发下会导致超卖
+	 * 基于redis队列验证库存信息
+	 * @desc Redis是底层是单线程的,命令执行是原子操作,包括lpush,lpop等.高并发下不会导致超卖
+	 *
 	 * @author liubin
 	 * @date 2017-02-10
 	*/
@@ -168,13 +170,8 @@ class seckill extends common
 
 	/*
 	 * 基于mysql事务验证库存信息
+	 * @desc 事务 和 行锁 模式,高并发下不会导致超卖，但效率会慢点
 	 * 
-	 * 事务锁定模式
-
-		系统默认： 不需要等待某事务结束，可直接查询到结果，但不能再进行修改、删除。
-		缺点：查询到的结果，可能是已经过期的。
-		优点：不需要等待某事务结束，可直接查询到结果。
-
 	 * @link http://www.cnblogs.com/ymy124/p/3718439.html
 	 * @author liubin
 	 * @date 2017-02-10
