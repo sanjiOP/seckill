@@ -1,5 +1,4 @@
 <?php
 	
-	//$url = 'http://192.168.16.73/redis/index.php?app=app&c=order&a=buypub&gid=1';
-	$url = 'http://192.168.16.73/redis/index.php?app=app&c=order&a=buyredis&gid=1';
+	$url = 'http://192.168.16.73/Seckill/index.php?app=app&c=seckill&a=addQsec&gid=1&type=redis';
 	file_get_contents($url);
