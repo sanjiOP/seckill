@@ -35,6 +35,14 @@
 		}
 
 		
+		/*
+		 * pdo handler
+		 *
+		*/
+		public function getHandler(){
+			return $this->_pdo;
+		}
+		
 		
 		/*
 		 * 查询sql
