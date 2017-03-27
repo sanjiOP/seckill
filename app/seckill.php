@@ -108,8 +108,8 @@ class seckill extends common
 		 * 超卖非常严重，就不说了
 		 * 
 		 * 2：$sql_forlock如果不加事务，只加写锁：
-		 * 读$sql_forlock时加锁，当$sql_forlock查询结束会释放该行锁，
-		 * 如果有并发，在$sql_inventory处有可能会再次实行$sql_forlock查库存
+		 * 第一个会话读$sql_forlock时加写锁，第一个会话$sql_forlock查询结束会释放该行锁.
+		 * 第二个会话在第一个会话释放后读$sql_forlock的写锁时，会再次$sql_forlock查库存
 		 * 导致超卖现象产生
 		 *
 		*/
@@ -224,12 +224,21 @@ class seckill extends common
 			 * $sql_inventory之后和commit之前才会锁定
 			 * 出现超卖跟事务的一致性不冲突
 			 * 
-			 * 2：$sql_forlock如果加了事务，又加写锁：
+			 *
+			 * 2：$sql_forlock如果加了事务，又加读锁：
 			 * 开启事务
-			 * 读$sql_forlock时加锁，直到commit才会释放写锁，并发查询不会出现超卖现象。
+			 * 第一个会话读$sql_forlock时加读锁，并发时，第二个会话也允许获得$sql_forlock的读锁，
+			 * 但是在第一个会话执行去库存操作时（写锁），写锁便会等待第二个会话的读锁，第二个会话执行写操作时，写锁便会等待第一个会话的读锁，
+			 * 出现死锁
+			 
+			 * 3：$sql_forlock如果加了事务，又加写锁：
+			 * 开启事务
+			 * 第一个会话读$sql_forlock时加写锁，直到commit才会释放写锁，并发查询不会出现超卖现象。
 			 *
 			*/
+			
 			$sql_forlock		= 'select * from goods where id = '.$gid .' limit 1 for update';
+			//$sql_forlock		= 'select * from goods where id = '.$gid .' limit 1 LOCK IN SHARE MODE';
 			//$sql_forlock		= 'select * from goods where id = '.$gid .' limit 1';
 			$result		= $pdo->query($sql_forlock,PDO::FETCH_ASSOC);
 			$goodsInfo	= $result->fetch();
